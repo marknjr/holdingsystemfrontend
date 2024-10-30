@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+table {
+    text-align: center!important;
+}
+
+th {
+    padding: 5px!important;
+}
+
+td {
+    padding: 5px!important;
+    @apply border
+}
+
+.flash-color-animation {
+    animation: flashColor 1s infinite;
+}
+
+@keyframes flashColor {
+    25%, 30% {
+        opacity: .1;
+    }
+
+    45%, 50% {
+        opacity: 1;
+    }
+
+    75%, 80% {
+        opacity: .1;
+    }
+
+    95%, 100% {
+        opacity: 1;
+    }
+}
