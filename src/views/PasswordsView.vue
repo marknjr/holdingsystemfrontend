@@ -15,8 +15,8 @@ export default defineComponent({
   components: {PasswordRow, PageWrapper},
   data() {
       return {
-        loginRequired: true,
-        loginPassword: '',
+        // loginRequired: true,
+        // loginPassword: '',
         tempPassword: DefaultPassword(),
         passwords: [] as Password[],
         filterUserCode: '',
@@ -89,25 +89,25 @@ export default defineComponent({
           return true;
       return false;
     },
-    async checkLogin() {
-      const passwordCorrect = await this.authenticationStore.checkCredentials(this.authenticationStore.userCode, this.loginPassword);
-      if(!passwordCorrect) {
-        this.notificationStore.add(NotificationType.Error, "Invalid Password");
-        return;
-      }
-      this.loginRequired = false;
-      try {
-        const response = await axios.get('/passwords/index');
-        if(!response || response.status != 200) {
-          this.notificationStore.add(NotificationType.Error, 'Could not load the initial data');
-          return;
-        }
-        this.passwords = response.data;
-      }
-      catch (e) {
-        this.notificationStore.add(NotificationType.Error, e as string);
-      }
-    },
+    // async checkLogin() {
+    //   const passwordCorrect = await this.authenticationStore.checkCredentials(this.authenticationStore.userCode, this.loginPassword);
+    //   if(!passwordCorrect) {
+    //     this.notificationStore.add(NotificationType.Error, "Invalid Password");
+    //     return;
+    //   }
+    //   this.loginRequired = false;
+    //   try {
+    //     const response = await axios.get('/passwords/index');
+    //     if(!response || response.status != 200) {
+    //       this.notificationStore.add(NotificationType.Error, 'Could not load the initial data');
+    //       return;
+    //     }
+    //     this.passwords = response.data;
+    //   }
+    //   catch (e) {
+    //     this.notificationStore.add(NotificationType.Error, e as string);
+    //   }
+    // },
     async createPassword() {
 
       for(const validation in this.submitValidation)
@@ -206,70 +206,103 @@ export default defineComponent({
   },
 
   async created() {
-    this.resetFields();
+  this.resetFields();
+  try {
+    const response = await axios.get('/passwords/index');
+    if (!response || response.status != 200) {
+      this.notificationStore.add(NotificationType.Error, 'Could not load the initial data');
+      return;
+    }
+    this.passwords = response.data;
+  } catch (e) {
+    this.notificationStore.add(NotificationType.Error, e as string);
   }
+}
 })
 </script>
 
 <template>
   <page-wrapper>
-    <div v-if="loginRequired" class="w-full h-full flex">
-      <div class="card w-96 bg-base-100 shadow-xl m-auto">
-        <div class="card-body">
-          <h2 class="card-title mx-auto">Re-enter Your Password</h2>
-          <form @submit.prevent="checkLogin">
-
-            <div class="form-control w-full max-w-xs">
-              <label class="label">
-                <span class="label-text">Password</span>
-              </label>
-              <input v-model="loginPassword" type="password" placeholder="Type here"
-                     class="input input-bordered w-full max-w-xs"/>
-            </div>
-            <div class="card-actions">
-              <button type="submit" class="btn btn-primary w-full mt-3">Continue</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    <table v-else class="table table-xs table-pin-rows z-0">
+    <table class="table table-xs table-pin-rows z-0">
       <thead class="table-md">
-      <tr>
-        <th v-if="authenticationStore.userType == UserType.Admin">User Code</th>
-        <th>Site</th>
-        <th>Email</th>
-        <th>Password</th>
-        <th>Main</th>
-        <th class="w-[150px]"></th>
-      </tr>
-      <tr class="bg-blue-300">
-        <td v-if="authenticationStore.userType == UserType.Admin"><input type="text" class="input input-bordered input-xs w-full max-w-xs" v-model="filterUserCode" /></td>
-        <td><input type="text" class="input input-bordered input-xs w-full max-w-xs" v-model="filterSite" /></td>
-        <td><input type="text" class="input input-bordered input-xs w-full max-w-xs" v-model="filterEmail" /></td>
-        <td><input type="text" class="input input-bordered input-xs w-full max-w-xs" v-model="filterPassword" /></td>
-        <td><input type="checkbox" class="checkbox checkbox-warning checkbox-sm" v-bind:indeterminate.prop="filterMain === null" v-model="filterMain" /></td>
-        <td>
-          <div class="flex gap-2">
-            <button class="btn btn-xs btn-info flex-grow" @click="clearFilters">Clear</button>
-            <button class="btn btn-xs btn-success flex-grow" @click="exportSelection">Export</button>
-          </div>
-        </td>
-      </tr>
+        <tr>
+          <th v-if="authenticationStore.userType == UserType.Admin">User Code</th>
+          <th>Site</th>
+          <th>Email</th>
+          <th>Password</th>
+          <th>Main</th>
+          <th class="w-[150px]"></th>
+        </tr>
+        <tr class="bg-blue-300">
+          <td v-if="authenticationStore.userType == UserType.Admin">
+            <input type="text" class="input input-bordered input-xs w-full max-w-xs" v-model="filterUserCode" />
+          </td>
+          <td>
+            <input type="text" class="input input-bordered input-xs w-full max-w-xs" v-model="filterSite" />
+          </td>
+          <td>
+            <input type="text" class="input input-bordered input-xs w-full max-w-xs" v-model="filterEmail" />
+          </td>
+          <td>
+            <input type="text" class="input input-bordered input-xs w-full max-w-xs" v-model="filterPassword" />
+          </td>
+          <td>
+            <input type="checkbox" class="checkbox checkbox-warning checkbox-sm" v-bind:indeterminate.prop="filterMain === null" v-model="filterMain" />
+          </td>
+          <td>
+            <div class="flex gap-2">
+              <button class="btn btn-xs btn-info flex-grow" @click="clearFilters">Clear</button>
+              <button class="btn btn-xs btn-success flex-grow" @click="exportSelection">Export</button>
+            </div>
+          </td>
+        </tr>
       </thead>
       <tbody>
-      <password-row v-for="password in visiblePasswords" :key="password.id" :password="password" @delete-password="deletePassword" @edit-password="editPassword" />
+        <password-row
+          v-for="password in visiblePasswords"
+          :key="password.id"
+          :password="password"
+          @delete-password="deletePassword"
+          @edit-password="editPassword"
+        />
 
-      <tr class="bg-blue-200">
-        <td v-if="authenticationStore.userType == UserType.Admin"><input type="text" :class="'input input-bordered input-xs w-full max-w-xs' + (submitValidation.user_code ? '' : ' input-error')" v-model="tempPassword.user_code" /></td>
-        <td><input type="text" :class="'input input-bordered input-xs w-full max-w-xs' + (submitValidation.site ? '' : ' input-error')" v-model="tempPassword.site" /></td>
-        <td><input type="text" :class="'input input-bordered input-xs w-full max-w-xs' + (submitValidation.email ? '' : ' input-error')" v-model="tempPassword.email" /></td>
-        <td><input type="text" autocomplete="new-password" :class="'input input-bordered input-xs w-full max-w-xs' + (submitValidation.password ? '' : ' input-error')" v-model="tempPassword.decrypted_password" /></td>
-        <td><input type="checkbox" class="toggle toggle-warning toggle-sm" v-model="tempPassword.main" /></td>
-        <td>
-          <button class="btn btn-xs btn-warning w-full" @click="createPassword()">Submit</button>
-        </td>
-      </tr>
+        <tr class="bg-blue-200">
+          <td v-if="authenticationStore.userType == UserType.Admin">
+            <input
+              type="text"
+              :class="'input input-bordered input-xs w-full max-w-xs' + (submitValidation.user_code ? '' : ' input-error')"
+              v-model="tempPassword.user_code"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              :class="'input input-bordered input-xs w-full max-w-xs' + (submitValidation.site ? '' : ' input-error')"
+              v-model="tempPassword.site"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              :class="'input input-bordered input-xs w-full max-w-xs' + (submitValidation.email ? '' : ' input-error')"
+              v-model="tempPassword.email"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              autocomplete="new-password"
+              :class="'input input-bordered input-xs w-full max-w-xs' + (submitValidation.password ? '' : ' input-error')"
+              v-model="tempPassword.decrypted_password"
+            />
+          </td>
+          <td>
+            <input type="checkbox" class="toggle toggle-warning toggle-sm" v-model="tempPassword.main" />
+          </td>
+          <td>
+            <button class="btn btn-xs btn-warning w-full" @click="createPassword()">Submit</button>
+          </td>
+        </tr>
       </tbody>
     </table>
   </page-wrapper>
