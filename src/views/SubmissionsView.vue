@@ -9,7 +9,7 @@
       <thead class="table-md bg-base-100 sticky top-0 z-[1]">
       <tr>
         <th class="cursor-pointer" @click="sortTable('user_code')">User Code</th>
-        <th class="cursor-pointer">On-Sale Time</th>
+        <th class="cursor-pointer on-sale-time-column">On-Sale Time</th>
         <th class="cursor-pointer" @click="sortTable('moment')">Time</th>
         <th class="cursor-pointer" @click="sortTable('moment')">Passed</th>
         <th class="cursor-pointer" @click="sortTable('event')">Name</th>
@@ -23,7 +23,7 @@
         <th class="cursor-pointer" @click="sortTable('face_value')">Face Value</th>
         <th class="cursor-pointer" @click="sortTable('generalStatus')">Status</th>
         <th class="cursor-pointer" @click="sortTable('primary')">Primary</th>
-        <th class="cursor-pointer" @click="sortTable('notes')">Notes</th>
+        <th class="cursor-pointer notes-column" @click="sortTable('notes')">Notes</th>
         <th class="cursor-pointer" @click="sortTable('last_minute')">1m</th>
         <th class="cursor-pointer" @click="sortTable('last_page')">LP</th>
         <th>Comments</th>
@@ -258,6 +258,19 @@ export default defineComponent({
 .fade-out {
   animation: fadeOut 3s;
   animation-fill-mode: forwards;
+  
+}
+.notes-column {
+  width: 90px; /* Adjust this value as needed */
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.on-sale-time-column {
+  width: 40px; /* Adjust as needed */
+  max-width: 40px;
+  text-align: center; /* Optional: center the text */
 }
 
 @keyframes fadeOut {

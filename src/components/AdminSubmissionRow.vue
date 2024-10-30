@@ -110,7 +110,10 @@ export default defineComponent({
 <template>
   <tr :class="colorClass + (ticketSubmission.shouldFlash ? ' flash-color-animation' : '')">
     <td class="whitespace-nowrap">{{ ticketSubmission.user_code }}</td>
-    <td class="whitespace-nowrap">{{ ticketSubmission.booking_event?.onsale_time ? moment.utc(ticketSubmission.booking_event?.onsale_time).format('HH:mm') : '' }}</td>
+    <td class="whitespace-nowrap on-sale-time-column">
+  {{ ticketSubmission.booking_event?.onsale_time ? moment.utc(ticketSubmission.booking_event?.onsale_time).format('HH:mm') : '' }}
+</td>
+
     <td class="whitespace-nowrap">{{ moment.utc(ticketSubmission.moment).format('HH:mm:ss') }}</td>
     <td class="whitespace-nowrap">
       <template v-if="ticketSubmission.purchase_state == PurchaseState.Pending">
@@ -140,7 +143,12 @@ export default defineComponent({
     <td>{{ ticketSubmission.face_value }}</td>
     <td class="whitespace-nowrap">{{ generalStatusString }}</td>
     <td class="whitespace-nowrap">{{ ticketSubmission.primary_info }}</td>
-    <td class="whitespace-nowrap">{{ ticketSubmission.notes }}</td>
+    <td
+  class="whitespace-nowrap notes-column"
+  :title="ticketSubmission.notes"
+>
+  {{ ticketSubmission.notes }}
+</td>
     <td class="whitespace-nowrap">
       <span class="font-bold text-red-600"
             v-if="ticketSubmission.last_minute">{{ ticketSubmission.remainingLastMinute ?? '' }}</span>
@@ -168,3 +176,18 @@ export default defineComponent({
     </td>
   </tr>
 </template>
+
+<style scoped>
+.notes-column {
+  width: 90px; 
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.on-sale-time-column {
+  width: 40px; 
+  max-width: 40px;
+  text-align: center; 
+}
+</style>
