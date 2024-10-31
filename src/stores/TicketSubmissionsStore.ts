@@ -114,6 +114,10 @@ export const useTicketSubmissionsStore = defineStore('ticketSubmissions', {
             });
         },
 
+        sortSubmissionsCustom(sortFunction: (a: TicketSubmission, b: TicketSubmission) => number) {
+            this.ticketSubmissions.sort(sortFunction);
+        },
+
         setGeneralStatus(submission: TicketSubmission) {
             if(submission.purchase_state == PurchaseState.Purchased)
                 submission.generalStatus = SubmissionGeneralStatus.Purchased;

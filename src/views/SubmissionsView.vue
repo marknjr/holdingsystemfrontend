@@ -65,6 +65,12 @@
         <td></td>
         <td></td>
         <td><button class="btn btn-xs btn-link" @click="clearFilters()">Clear Filters</button></td>
+        <div class="form-control">
+            <label class="label cursor-pointer">
+                <input type="checkbox" class="checkbox checkbox-xs" v-model="groupByColor">
+                <span class="text-xs">Group by Color</span>
+            </label>
+        </div>
       </tr>
       </thead>
       <tbody>
@@ -156,9 +162,26 @@ export default defineComponent({
     }
   },
 
+  watch: {
+    groupByColor(newValue: boolean) {
+        localStorage.setItem('groupByColor', newValue.toString());
+        if (this.sortColumn) {
+            this.sortTable(this.sortColumn);
+        }
+    }
+},
+
+created() {
+    const savedGrouping = localStorage.getItem('groupByColor');
+    if (savedGrouping !== null) {
+        this.groupByColor = savedGrouping === 'true';
+    }
+},
+
   data() {
     return {
       sortColumn: '',
+      groupByColor: true,
       sortReverse: false,
       quantityError: '',
       filterUserCode: '',
@@ -222,15 +245,71 @@ export default defineComponent({
       }
     },
 
-    sortTable(column: string){
-      if(column == this.sortColumn)
+    sortTable(column: string) {
+    if(column == this.sortColumn) {
         this.sortReverse = !this.sortReverse;
-      else {
+    } else {
         this.sortColumn = column;
         this.sortReverse = false;
-      }
-      this.ticketSubmissionsStore.sortSubmissions(this.sortColumn, this.sortReverse);
-    },
+    }
+
+    const getColorPriority = (submission: TicketSubmission): number => {
+    switch (submission.generalStatus) {
+        case SubmissionGeneralStatus.HighDemand:
+            return 1; // Light green first
+        case SubmissionGeneralStatus.LowDemand:
+            return 2; // Light red second
+        case SubmissionGeneralStatus.Purchased:
+            return 3; // Dark green third
+        case SubmissionGeneralStatus.Hold:
+            return 4; // Yellow/orange fourth
+        case SubmissionGeneralStatus.Discarded:
+            return 5; // Dark red fifth
+        case SubmissionGeneralStatus.Lost:
+            return 6; // Orange last
+        default:
+            return 7;
+    }
+};
+
+    const sortFunction = (a: TicketSubmission, b: TicketSubmission) => {
+        if (this.groupByColor) {
+            const colorCompare = getColorPriority(a) - getColorPriority(b);
+            if (colorCompare !== 0) {
+                return this.sortReverse ? -colorCompare : colorCompare;
+            }
+        }
+
+        let aValue: any = a[column];
+        let bValue: any = b[column];
+
+        if (column === 'event') {
+            aValue = a.booking_event?.name || '';
+            bValue = b.booking_event?.name || '';
+        } else if (column === 'arena') {
+            aValue = a.booking_event?.arena || '';
+            bValue = b.booking_event?.arena || '';
+        } else if (column === 'day') {
+            aValue = a.booking_event?.day || '';
+            bValue = b.booking_event?.day || '';
+        }
+
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+            aValue = aValue.toLowerCase();
+            bValue = bValue.toLowerCase();
+        }
+
+        if (typeof aValue === 'number' && typeof bValue === 'number') {
+            return this.sortReverse ? bValue - aValue : aValue - bValue;
+        }
+
+        if (aValue < bValue) return this.sortReverse ? 1 : -1;
+        if (aValue > bValue) return this.sortReverse ? -1 : 1;
+        return 0;
+    };
+
+    this.ticketSubmissionsStore.sortSubmissionsCustom(sortFunction);
+},
 
     generalStatusString(submission: TicketSubmission) {
       switch (submission.generalStatus) {
@@ -261,16 +340,16 @@ export default defineComponent({
   
 }
 .notes-column {
-  width: 90px; /* Adjust this value as needed */
+  width: 90px; 
   max-width: 100px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .on-sale-time-column {
-  width: 40px; /* Adjust as needed */
+  width: 40px; 
   max-width: 40px;
-  text-align: center; /* Optional: center the text */
+  text-align: center; 
 }
 
 @keyframes fadeOut {
