@@ -12,7 +12,21 @@ export default defineComponent({
   },
   computed: {
     summaryStore: () => useSummaryStore(),
-    bookingEventsStore: () => useBookingEventsStore()
+    bookingEventsStore: () => useBookingEventsStore(),
+
+    totalTickets() {
+      return this.bookingEventsStore.bookingEvents.reduce((total, event) => {
+        return total + (this.summaryStore.purchaseCounters[event.id]?.quantity || 0);
+      }, 0);
+    },
+
+    // Computed property for total spend
+    totalSpend() {
+      return this.bookingEventsStore.bookingEvents.reduce((total, event) => {
+        return total + (this.summaryStore.purchaseCounters[event.id]?.predictedValue || 0);
+      }, 0).toFixed(2); // Format to 2 decimal places
+    }
+
   }
 })
 </script>
@@ -41,6 +55,14 @@ export default defineComponent({
           <td>{{ summaryStore.pendingCounters[bookingEvent.id].quantity }} (predicted: {{ summaryStore.pendingCounters[bookingEvent.id].predictedValue.toFixed(2) }})</td>
           <td>{{ summaryStore.lostCounters[bookingEvent.id].quantity }} (predicted: {{ summaryStore.lostCounters[bookingEvent.id].predictedValue.toFixed(2) }})</td>
         </tr>
+
+        <tr class="font-bold">
+            <td colspan="3" class="text-right">Total:</td>
+            <td>{{ totalTickets }}</td>
+            <td></td>
+            <td>{{ totalSpend }}</td>
+          </tr>
+          
         </tbody>
       </table>
     </div>

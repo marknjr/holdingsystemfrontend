@@ -9,6 +9,14 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+      path: '/phone-numbers',
+      name: 'phone-numbers',
+      component: () => import('@/views/PhoneNumbersView.vue'),
+      meta: {
+        title: 'Phone Numbers'
+      }
+    },
+    {
       path: '/user-settings',
       name: 'user-settings',
       component: () => import('@/views/UserSettingsView.vue'),
@@ -106,7 +114,7 @@ router.beforeEach(async (to, from) => {
   if(!authenticationStore.loggedIn) {
     return {path: '/login'}
   }
-  const commonRoutes = ['passwords', 'user-settings'];
+  const commonRoutes = ['passwords', 'user-settings', 'phone-numbers'];
   if(commonRoutes.includes(to.name as string))
     return true;
   const clientRoutes = ['client', 'client2'];
