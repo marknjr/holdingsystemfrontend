@@ -141,8 +141,8 @@ export default defineComponent({
     <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/submissions">Submissions</router-link>
     <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/events">Events</router-link>
     <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/admins">Admins</router-link>
-    <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/user-settings">User Settings</router-link> <!-- New Button -->
-    <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/phone-numbers">Phone Numbers</router-link>
+    <!--<router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/user-settings">User Settings</router-link>  -->
+   <!-- <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/phone-numbers">Phone Numbers</router-link>-->
     <button @click="$emit('resetAppClicked')" class="btn btn-xs btn-error w-full whitespace-nowrap">Reset
       App
     </button>

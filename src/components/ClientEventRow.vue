@@ -71,7 +71,7 @@ export default defineComponent({
 
     // Validate other fields if necessary
     for (const validation in this.submitValidation)
-      if (!this.submitValidation[validation])
+      if (!(this.submitValidation as any)[validation])
         return;
 
     this.webSocketsStore.sendMessage({

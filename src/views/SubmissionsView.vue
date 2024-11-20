@@ -280,8 +280,8 @@ created() {
             }
         }
 
-        let aValue: any = a[column];
-        let bValue: any = b[column];
+        let aValue: any = (a as any)[column];
+        let bValue: any = (b as any)[column];
 
         if (column === 'event') {
             aValue = a.booking_event?.name || '';
