@@ -23,7 +23,15 @@ const router = createRouter({
     //   meta: {
     //     title: 'User Settings'
     //   }
-    // },    
+    // },  
+    {
+      path: '/password-test',
+      name: 'password-test', 
+      component: () => import('@/views/PasswordTestView.vue'),
+      meta: {
+        title: 'Password Test'
+      }
+    },  
     {
       path: '/client',
       name: 'client',

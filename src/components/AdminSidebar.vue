@@ -138,6 +138,7 @@ export default defineComponent({
 
   <div class="p-2 gap-2 flex flex-col pb-10">
     <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/passwords">Passwords</router-link>
+    <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/password-test">Password Test</router-link>
     <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/submissions">Submissions</router-link>
     <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/events">Events</router-link>
     <router-link class="btn btn-xs btn-info w-full whitespace-nowrap" to="/admins">Admins</router-link>
